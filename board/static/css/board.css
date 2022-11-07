@@ -1,0 +1,119 @@
+.home {
+    height: 100%;
+    background: #f5f6fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.home_frame {
+    height: 432px;
+    display: flex;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0px 2px 20px 0 rgb(192 192 205 / 20%);
+}
+
+.home_frame_background {
+    width: 384px;
+    height: 100%;
+    background-image: url("/static/image/home_bg.png");
+    background-repeat: no-repeat;
+    background-color: #f9faff;
+}
+
+.home_frame_write {
+    width: 324px;
+    padding: 80px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    cursor: default;
+}
+
+.home_frame_write > h1 {
+    color: #1a1a1e;
+    font-size: 30px;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.home_frame_write_join_meeting {
+    float:left;
+    padding:20px;
+}
+
+.home_frame_write_join_meeting > img {
+    display:block;
+    margin:20px;
+    cursor: pointer;
+}
+
+.home_frame_write_create_meeting {
+    float:right;
+    padding:20px;
+}
+
+.home_frame_write_create_meeting > img {
+    display:block;
+    margin:20px;
+    cursor: pointer;
+}
+
+.home_frame_form {
+    width: 324px;
+    padding: 80px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.home_frame_form > h1 {
+    color: #1a1a1e;
+    font-size: 30px;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.home_frame_write_form_item_roomid {
+    margin-bottom: 2px;
+    display: flex;
+    flex-direction: column;
+}
+
+.home_frame_write_form_item_roomid_input {
+    height: 40px;
+    outline: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom-color: #f3f3f3;
+    padding-left: 4px;
+    color: #5a5a67;
+    font-size: 14px;
+}
+
+.home_frame_write_form_item_roomid_input_warn {
+    opacity: 1;
+    transition: opacity 1s;
+    bottom: 0;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #fe001d;
+    cursor: context-menu;
+}
+
+.home_frame_write_form_submit {
+    background: #314bff;
+    font-size: 14px;
+    color: #ffffff;
+    text-align: center;
+    height: 40px;
+    line-height: 40px;
+    margin: 0 60px;
+    border-radius: 40px;
+    cursor: pointer;
+    user-select: none;
+}
