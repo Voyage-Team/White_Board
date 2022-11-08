@@ -244,7 +244,7 @@ class BoardObject {
         this.$frame_write_operate_create_meeting.click(function(){ // 快速创建白板
             console.log("快速创建白板");
             $.ajax({
-                url:"http://123.57.187.239:8000/redis/create/",
+                url:"http://198.148.99.145:8000/redis/create/",
                 data:{},
                 type:"GET",
                 success:function(resp) {
@@ -263,7 +263,7 @@ class BoardObject {
             let roomid = outer.$frame_write_form_roomid_input.val(); // 对于roomid需要确定在redis中是否存在
             outer.$frame_write_form_roomid_input_warn.hide();
             $.ajax({
-                url:"http://123.57.187.239:8000/redis/query/",
+                url:"http://198.148.99.145:8000/redis/query/",
                 data:{
                     roomid:roomid,
                 },
