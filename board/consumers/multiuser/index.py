@@ -6,16 +6,16 @@ from django.core.cache import cache
 
 class MultiUser(WebsocketConsumer):
     def connect(self):
-        #self.roomid = self.scope['url_route']['kwargs']['roomid']
-        #self.mode = self.scope['url_route']['kwargs']['mode']
-        #self.room_group_name = 'board_%s' % self.roomid
-        #print("roomid:" + self.roomid + " mode:" + self.mode)
+        self.roomid = self.scope['url_route']['kwargs']['roomid']
+        self.mode = self.scope['url_route']['kwargs']['mode']
+        self.room_group_name = 'board_%s' % self.roomid
+        print("roomid:" + self.roomid + " mode:" + self.mode)
         # self.room_group_name = 'board_11'
-        # # Join room group
-        # async_to_sync(self.channel_layer.group_add)(
-        #     self.room_group_name,
-        #     self.channel_name
-        # )
+        # Join room group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+        )
         print("成功连接")
         self.accept()
 
@@ -27,18 +27,18 @@ class MultiUser(WebsocketConsumer):
         )
 
     # Receive message from WebSocket
-    def receive(self, text_data):
+    def receive(self, text_data:str) -> None:
+        print(text_data)
         text_data_json = json.loads(text_data)
+        print(text_data_json)
         message = text_data_json['message']
-
-        # Send message to room group
+        print("----")
         async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
+            self.room_group_name, {
+                'type': 'chat.message',  # 必须在MsgConsumer类中定义chat_message
                 'message': message
-            }
-        )
+            })
+
 
     # Receive message from room group
     def chat_message(self, event):
