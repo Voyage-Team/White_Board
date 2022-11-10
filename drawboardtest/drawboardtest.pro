@@ -11,22 +11,21 @@ CONFIG += c++11
 SOURCES += \
     Scene.cpp \
     View.cpp \
-    canvas.cpp \
     kernel.cpp \
     main.cpp \
     mainwindow.cpp \
+    netconnect.cpp \
     shapes.cpp
 
 HEADERS += \
     Scene.h \
     View.h \
-    canvas.h \
     kernel.h \
     mainwindow.h \
+    netconnect.h \
     shapes.h
 
 FORMS += \
-    canvas.ui \
     mainwindow.ui
 
 # Default rules for deployment.
@@ -36,3 +35,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     Image.qrc
+
+QT += core gui network

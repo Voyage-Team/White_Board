@@ -1,7 +1,7 @@
 #include "Scene.h"
 #include <QDebug>
 #include "View.h"
-Scene::Scene(QObject *parent)
+QScene::QScene(QObject *parent)
     :QGraphicsScene(parent)
     ,m_id(-1)
     ,m_toolTyep(tt_Line)
@@ -10,7 +10,7 @@ Scene::Scene(QObject *parent)
 
 }
 
-void Scene::setToolType(int type)
+void QScene::setToolType(int type)
 {
     m_toolTyep = type;
     if(m_currentShape != nullptr)
@@ -21,14 +21,15 @@ void Scene::setToolType(int type)
         }
         m_currentShape = nullptr;
     }
+
 }
 
-Scene :: ~Scene()
+QScene :: ~QScene()
 {
 
 }
 
-void Scene::onFigureAdded(const QJsonObject &figure)
+void QScene::onFigureAdded(const QJsonObject &figure)
 {
     qDebug() << "PainterScene::onFigureAdded";
     Shapes *item = nullptr;
@@ -99,10 +100,10 @@ void Scene::onFigureAdded(const QJsonObject &figure)
         item->setEndPoint(endPos);
     }
 
-    else if(strTyep == "graffiti")
+    else if(strTyep == "curve")
     {
-        Curve *graffiti = new Curve();
-        item = graffiti;
+        Curve *curve = new Curve();
+        item = curve;
 
         QPainterPath path;
         int size  = points.size();
@@ -111,7 +112,7 @@ void Scene::onFigureAdded(const QJsonObject &figure)
         {
             path.lineTo(points[i].toInt(),points[i+1].toInt());
         }
-        graffiti->setPath(path);
+        curve->setPath(path);
 
     }
     else
@@ -132,7 +133,7 @@ void Scene::onFigureAdded(const QJsonObject &figure)
 
 }
 
-void Scene::onFigureDeleted(int id)
+void QScene::onFigureDeleted(int id)
 {
     qDebug() <<"PainterScene::onFigureDeleted";
     auto it = std::find_if(m_shapes.begin(),m_shapes.end(),
@@ -151,7 +152,7 @@ void Scene::onFigureDeleted(int id)
     }
 }
 
-void Scene::onFigureCleared(int ownerId)
+void QScene::onFigureCleared(int ownerId)
 {
         qDebug() <<"PainterScene::onFigureCleared";
         if(ownerId == -1)
@@ -178,7 +179,7 @@ void Scene::onFigureCleared(int ownerId)
         }
 }
 
-void Scene::undo()
+void QScene::undo()
 {
     if(m_shapes.size())
     {
@@ -188,7 +189,7 @@ void Scene::undo()
 }
 
 
-void Scene::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void QScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsScene::mousePressEvent(event);
     if(event->button() != Qt::LeftButton) return ;
@@ -197,17 +198,17 @@ void Scene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         switch (m_toolTyep) {
         case tt_Line:
             m_currentShape = new Line();
-            m_currentShape->setStrokeColor(Qt::blue);
-            m_currentShape->setStrokeWidth(8);
+            m_currentShape->setStrokeColor(Qt::black);
+            m_currentShape->setStrokeWidth(2);
             break;
         case tt_Rectangle:
             m_currentShape = new rRectangle();
-            m_currentShape->setStrokeWidth(8);
+            m_currentShape->setStrokeWidth(2);
             break;
         case tt_Oval:
             m_currentShape = new  Oval();
-            m_currentShape->setStrokeWidth(0);
-            m_currentShape->setFillColor(Qt::red);
+            m_currentShape->setStrokeWidth(2);
+            //m_currentShape->setFillColor(Qt::red);
             break;
         case tt_Triangle:
             m_currentShape = new Triangle();
@@ -230,7 +231,7 @@ void Scene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
-void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void QScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
 
     QGraphicsScene::mouseMoveEvent(event);
@@ -242,7 +243,7 @@ void Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 }
 
-void Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void QScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
 
 

@@ -12,9 +12,9 @@ void View::resizeEvent(QResizeEvent *event)
     QGraphicsView::resizeEvent(event);
     const QSize &size = event->size();
     QGraphicsScene *s = scene();
-    if(NULL  !=s )
+    if(NULL !=s )
     {
-        QRectF rc(0,0,size.width(),size.height());
+        QRectF rc(20,20,size.width(),size.height());
         setSceneRect(rc);
         s->setSceneRect(rc);
 

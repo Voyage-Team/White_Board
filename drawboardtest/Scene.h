@@ -6,12 +6,12 @@
 #include<QPen>
 #include<QColor>
 #include<list>
-class Scene:public QGraphicsScene
+class QScene:public QGraphicsScene
 {
     Q_OBJECT
 public:
-    Scene(QObject *parent = 0);
-    ~Scene();
+    QScene(QObject *parent = 0);
+    ~QScene();
     void setToolType(int type);
 
     void setUserId(int id) { m_id = id; }

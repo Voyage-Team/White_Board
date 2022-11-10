@@ -3,6 +3,7 @@
 #include <QVBoxLayout>
 #include <QToolBar>
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -11,12 +12,110 @@ MainWindow::MainWindow(QWidget *parent)
     ui->la->hide();
     ui->lb->hide();
     ui->pushButton->hide();
-
+    setMouseTracking(true);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    Del();
+}
+
+void MainWindow::hideUi2()
+{
+    ui->jpg->hide();
+    ui->l1->hide();
+    ui->la->hide();
+    ui->lb->hide();
+    ui->pushButton->hide();
+    ui->back->hide();
+}
+
+void MainWindow::prepareCanvas()
+{
+//    connect(this, SIGNAL(SIG_rev()),this,SLOT(Rev()));
+//    connect(this, SIGNAL(SIG_DrawCur()),this,SLOT(DrawCurve()));
+//    connect(this, SIGNAL(SIG_DrawLine()),this,SLOT(DrawLine()));
+//    connect(this, SIGNAL(SIG_DrawOval()),this,SLOT(DrawOval()));
+//    connect(this, SIGNAL(SIG_DrawRec()),this,SLOT(DrawRec()));
+//    connect(this, SIGNAL(SIG_DrawTri()),this,SLOT(DrawTri()));
+
+//    m_scene = new QScene;
+//    View *vview = new View(m_scene);
+//    setCentralWidget(vview);
+        QToolBar *toolbar = addToolBar("Figure Type");
+        QActionGroup *actionGroup = new QActionGroup(toolbar);
+
+        m_toolBar = toolbar;
+
+        QAction *action = toolbar->addAction(QIcon(":/png/line.png"),
+                                             "Draw a Line",
+                                             this,SLOT(DrawLine()));
+        action->setCheckable(true);
+        action->setChecked(true);
+        action->setActionGroup(actionGroup);
+
+        action = toolbar->addAction(QIcon(":/png/Rectangle.png"),
+                                    "Draw a Rectangle",
+                                    this,SLOT(DrawRec()));
+        action->setCheckable(true);
+        action->setActionGroup(actionGroup);
+
+        action = toolbar->addAction(QIcon(":/png/Oval.png"),
+                                    "Draw a Oval",this,SLOT(DrawOval()));
+        action->setCheckable(true);
+        action->setActionGroup(actionGroup);
+
+        action = toolbar->addAction(QIcon(":/png/Triangle.png"),
+                                    "Draw a Triangle",this,SLOT(DrawTri()));
+        action->setCheckable(true);
+        action->setActionGroup(actionGroup);
+
+        action = toolbar->addAction(QIcon(":/png/curve.png"),
+                                    "Draw as you like",this,SLOT(DrawCurve()));
+        action->setCheckable(true);
+        action->setActionGroup(actionGroup);
+
+        toolbar->addSeparator();
+        action = toolbar ->addAction(QIcon(":/png/revoke.png"),
+                                     "Delete the Last",this,SLOT(Rev()));
+        //action->setCheckable(true);
+        action->setActionGroup(actionGroup);
+
+
+        action = toolbar->addAction(QIcon(":/png/delete.png"),
+                                    "Clear All",this,SLOT(Del()));
+        //action->setCheckable(true);
+        action->setActionGroup(actionGroup);
+
+    m_scene = new QScene();
+    View *vieww = new View(m_scene);
+
+    connect(m_scene,SIGNAL(addFigureReq(QJsonObject)),
+            this,SLOT(onAddFigureReq(QJsonObject)));
+    connect(m_scene,SIGNAL(deletFigureReq(int)),
+            this,SLOT(onDeleteFigureReq(int)));
+    connect(m_scene,SIGNAL(clearFigureReq(int)),
+            this,SLOT(onClearFigureReq(int)));
+
+    setCentralWidget(vieww);
+    Join();
+    //setCentralWidget(this->centralWidget());
+}
+
+void MainWindow::hideUi1()
+{
+    ui->button1->hide();
+    ui->button2->hide();
+    ui->jpg->hide();
+    ui->l1->hide();
+    ui->l2->hide();
+    ui->l3->hide();
+    ui->back->hide();
 }
 
 
@@ -38,7 +137,7 @@ void MainWindow::on_button1_clicked()
 //    dialog = new Dialog111;
 //    dialog->showNormal();
     int numC = rand()%100;
-    Q_EMIT SIG_NumCreate(numC);
+    Q_EMIT SIG_Num_Create(numC);
 
 }
 
@@ -47,69 +146,133 @@ void MainWindow::on_pushButton_clicked()
 {
     QString numQ = ui->la->text();
     int num = numQ.toInt();
-    Q_EMIT SIG_Num(num);
-//    if(num == "1"){
-//        dialog = new Dialog111;
-//        dialog->showNormal();
-//    } else{
-//         QMessageBox::critical(this, "提示", "房间号不存在");
-//         ui->button1->show();
-//         ui->button2->show();
-//         //ui->l1->hide();
-//         ui->l2->show();
-//         ui->l3->show();
-//         ui->la->hide();
-//         ui->lb->hide();
-//         ui->pushButton->hide();
-    //    }
+    Q_EMIT SIG_Num_Join(num);
 }
 
-void MainWindow::prepareCanvasUi()
+void MainWindow::DrawCurve()
 {
-    QToolBar *toolbar = addToolBar("Figure Type");
-    QActionGroup *actionGroup = new QActionGroup(toolbar);
+    m_scene->setToolType(tt_Curve);
+}
 
-    m_toolBar = toolbar;
+void MainWindow::DrawLine()
+{
+    m_scene->setToolType(tt_Line);
+}
 
-    QAction *action = toolbar->addAction(QIcon(":/line.png"),
-                                         "Draw a Line",
-                                         this,SLOT(onDrawLineAction()));
-    action->setCheckable(true);
-    action->setChecked(true);
-    action->setActionGroup(actionGroup);
+void MainWindow::DrawOval()
+{
+    m_scene->setToolType(tt_Oval);
+}
 
-    action = toolbar->addAction(QIcon(":/rect.png"),
-                                "Draw a Rectangle",
-                                this,SLOT(onDrawRectangleAction()));
-    action->setCheckable(true);
-    action->setActionGroup(actionGroup);
+void MainWindow::DrawRec()
+{
+    m_scene->setToolType(tt_Rectangle);
+}
 
-    action = toolbar->addAction(QIcon(":/oval.png"),
-                                "Draw a Oval",this,SLOT(onDrawOvalAction()));
-    action->setCheckable(true);
-    action->setActionGroup(actionGroup);
+void MainWindow::DrawTri()
+{
+    m_scene->setToolType(tt_Triangle);
+}
 
-    action = toolbar->addAction(QIcon(":/triangle.png"),
-                                "Draw a Triangle",this,SLOT(onDrawTriangleAction()));
-    action->setCheckable(true);
-    action->setActionGroup(actionGroup);
+void MainWindow::Rev()
+{
+    m_scene->undo();
+}
 
-    action = toolbar->addAction(QIcon(":/pen.png"),
-                                "Draw as you like",this,SLOT(onDrawGraffitiAction()));
-    action->setCheckable(true);
-    action->setActionGroup(actionGroup);
+void MainWindow::Del()
+{
+    if(conn) conn->clearFigure(-1);
+}
 
-    toolbar->addSeparator();
-    action = toolbar ->addAction(QIcon(":/del.png"),
-                                 "Delete the Last",this,SLOT(onUnio()));
-    //action->setCheckable(true);
-    action->setActionGroup(actionGroup);
+void MainWindow::Join()
+{
+    if(!conn)
+    {
+        conn = new NetConnect(this);
+        QString  strName = ui->la->text();
+        connect(conn,SIGNAL(joined(QString,int)),
+                this,SLOT(onJoined(QString,int)));
+        connect(conn,SIGNAL(userLeft(QString,int)),
+                this,SLOT(onUserLeft(QString,int)));
+        connect(conn,SIGNAL(figureAdded(QJsonObject)),
+                this,SLOT(onFigureAdded(QJsonObject)));
+        connect(conn,SIGNAL(figureDeleted(int)),
+                this,SLOT(onFigureDeleted(int)));
+        connect(conn,SIGNAL(figureCleared(int)),
+                this,SLOT(onFigureCleared(int)));
+        //m_conn->join(strName,"111.231.61.143",9001);
 
+        conn->join(strName,"127.0.0.1",9001);
 
-    action = toolbar->addAction(QIcon(":/clear.png"),
-                                "Clear All",this,SLOT(onClearAll()));
-    //action->setCheckable(true);
-    action->setActionGroup(actionGroup);
+    }
+}
+
+void MainWindow::onJoined(QString name, int id)
+{
+    if(id == conn->id())
+    {
+        ui->l3 = nullptr;
+        //preparePainterUI();
+        m_scene->setUserId(id);
+
+    }
+    else
+    {
+
+    }
+}
+
+void MainWindow::onUserLeft(QString name, int id)
+{
+    if(id == conn->id())
+    {
+        m_scene = nullptr;
+        removeToolBar(m_toolBar);
+        //prepareJoinUI();
+    }
+    else
+    {
+
+    }
+}
+
+void MainWindow::onFigureAdded(const QJsonObject &figure)
+{
+    m_scene->onFigureAdded(figure);
+}
+
+void MainWindow::onFigureDeleted(int id)
+{
+    m_scene->onFigureDeleted(id);
+}
+
+void MainWindow::onFigureCleared(int ownerId)
+{
+    m_scene->onFigureCleared(ownerId);
+}
+
+void MainWindow::onErrorOccured(const QString &desc)
+{
+    //prepareJoinUI();
+    if(conn)
+    {
+        conn->deleteLater();
+        conn = nullptr;
+    }
+}
+
+void MainWindow::onAddFigureReq(const QJsonObject &figure)
+{
+    if(conn) conn->addFigure(figure);
 
 }
 
+void MainWindow::onDeleteFigureReq(int id)
+{
+    if(conn) conn->deleteFigure(id);
+}
+
+void MainWindow::onClearFigureReq(int ownerId)
+{
+    if(conn) conn->clearFigure(ownerId);
+}
