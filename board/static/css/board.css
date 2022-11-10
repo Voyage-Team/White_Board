@@ -1,3 +1,4 @@
+/*-------------- home界面 --------------*/
 .home {
     height: 100%;
     background: #f5f6fa;
@@ -116,4 +117,100 @@
     border-radius: 40px;
     cursor: pointer;
     user-select: none;
+}
+
+/*-------------- 画布 --------------*/
+.board_paint {
+    cursor: default;
+    /* cursor: url("/static/image/sidebar/pen.ico")8 20, pointer; */
+}
+
+
+/*-------------- 侧边栏 --------------*/
+.sidebar {
+    position: fixed;
+    top:0;
+    bottom: 0;
+    margin: auto;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.toolbar {
+    background: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0px 2px 20px 0px rgb(192 192 205 / 20%);
+    padding: 8px 2px;
+}
+
+.toolbar_tool {
+    position: relative;
+    padding: 6px 6px;
+}
+
+.toolbar_tool_button {
+    z-index: 40;
+    border-radius: 4px;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.toolbar_tool_button_icon_line {
+    height: 20px;
+    width: 20px;
+    font-size: 20px;
+    opacity: 1;
+    color: #5a5a67;
+    background-image: url("/static/image/sidebar/line.png");
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.toolbar_tool_button_icon_rectangle {
+    height: 20px;
+    width: 20px;
+    font-size: 20px;
+    opacity: 1;
+    color: #5a5a67;
+    background-image: url("/static/image/sidebar/Rectangle.png");
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.toolbar_tool_button_icon_oval {
+    height: 20px;
+    width: 20px;
+    font-size: 20px;
+    opacity: 1;
+    color: #5a5a67;
+    background-image: url("/static/image/sidebar/Oval.png");
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.toolbar_tool_button_icon_triangle {
+    height: 20px;
+    width: 20px;
+    font-size: 20px;
+    opacity: 1;
+    color: #5a5a67;
+    background-image: url("/static/image/sidebar/Triangle.png");
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.toolbar_tool_button_icon_pen {
+    height: 20px;
+    width: 20px;
+    font-size: 20px;
+    opacity: 1;
+    color: #5a5a67;
+    background-image: url("/static/image/sidebar/pen.png");
+    background-size: 100% 100%;
+    cursor: pointer;
 }
