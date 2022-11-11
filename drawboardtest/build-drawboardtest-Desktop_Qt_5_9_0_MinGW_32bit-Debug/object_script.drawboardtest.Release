@@ -1,0 +1,16 @@
+INPUT(
+./release\Scene.o
+./release\View.o
+./release\kernel.o
+./release\main.o
+./release\mainwindow.o
+./release\netconnect.o
+./release\shapes.o
+./release\dialog.o
+./release\qrc_Image.o
+./release\moc_Scene.o
+./release\moc_kernel.o
+./release\moc_mainwindow.o
+./release\moc_netconnect.o
+./release\moc_dialog.o
+);
