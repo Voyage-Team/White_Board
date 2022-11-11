@@ -34,8 +34,8 @@ class BoardCanvas extends BoardObject {
                 var curPos = outer.getCursorPos(outer.ctx.canvas, e);
                 outer.startX = curPos.x;
                 outer.startY = curPos.y;
-                // outer.newstartX = curPos.x;
-                // outer.newstartY = curPos.y;
+                outer.newstartX = curPos.x;
+                outer.newstartY = curPos.y;
                 const x = curPos.x;
                 const y = curPos.y;
                 outer.points.push({x, y});
@@ -83,8 +83,8 @@ class BoardCanvas extends BoardObject {
                                 x: (lastTwoPoints[0].x + lastTwoPoints[1].x) / 2,
                                 y: (lastTwoPoints[0].y + lastTwoPoints[1].y) / 2,
                             }
-                            outer.drawLine(outer.beginPoint, controlPoint, endPoint);
-                            outer.addbeisaierquxian(outer.beginPoint, controlPoint, endPoint);
+                            outer.addBezierCurve(outer.ctx, outer.beginPoint, controlPoint, endPoint);
+                            outer.saveBezierCurve(outer.beginPoint, controlPoint, endPoint);
                             outer.beginPoint = endPoint;
                         }
                         // outer.addpen(outer.ctx, outer.newstartX, outer.newstartY, curPos.x, curPos.y);
@@ -105,16 +105,25 @@ class BoardCanvas extends BoardObject {
         });
     }
 
-    drawLine(beginPoint, controlPoint, endPoint) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(beginPoint.x, beginPoint.y);
-        this.ctx.quadraticCurveTo(controlPoint.x, controlPoint.y, endPoint.x, endPoint.y);
-        this.ctx.stroke();
-        this.ctx.closePath();
+    addBezierCurve(ctx, beginPoint, controlPoint, endPoint) { // 画贝塞尔曲线
+        ctx.beginPath();
+        ctx.moveTo(beginPoint.x, beginPoint.y);
+        ctx.quadraticCurveTo(controlPoint.x, controlPoint.y, endPoint.x, endPoint.y);
+        ctx.stroke();
+        ctx.closePath();
     }
 
     savePoint(startX, startY, endX, endY) {
 
+    }
+
+    getCursorPos(canvas, e) { // 获取鼠标当前位置
+        var rect = canvas.getBoundingClientRect();
+        //console.log("计算坐标:", (e.clientX - rect.left) * (canvas.width / rect.width),(e.clientY - rect.top) * (canvas.height / rect.height));
+        return {
+            x : (e.clientX - rect.left) * (canvas.width / rect.width),
+            y : (e.clientY - rect.top) * (canvas.height / rect.height)
+        };
     }
 
     clearCanvas(ctx, canvas) { // 清空画布
@@ -139,12 +148,12 @@ class BoardCanvas extends BoardObject {
                     this.addtriangle(ctx, shape.startX, shape.startY, shape.endX, shape.endY);
                     break;
                 case "pen":
-                    this.drawLine(shape.beginPoint, shape.controlPoint, shape.endPoint);
+                    this.addBezierCurve(ctx, shape.beginPoint, shape.controlPoint, shape.endPoint);
             }
         }
     }
 
-    addShape(startX, startY, endX, endY) { // 松开鼠标时，添加图形进数组
+    addShape(startX, startY, endX, endY) { // 松开鼠标时，添加规则图形进数组
         var shape = new Object();
         shape.type = this.paint_board.mode;
         shape.startX = startX;
@@ -154,23 +163,13 @@ class BoardCanvas extends BoardObject {
         this.shapeList.push(shape);
     }
 
-    addbeisaierquxian(beginPoint, controlPoint, endPoint) { // 存贝塞尔曲线
+    saveBezierCurve(beginPoint, controlPoint, endPoint) { // 存贝塞尔曲线
         var shape = new Object();
         shape.type = this.paint_board.mode;
         shape.beginPoint = beginPoint;
         shape.controlPoint = controlPoint;
         shape.endPoint = endPoint;
         this.shapeList.push(shape);
-    }
-
-    getCursorPos(canvas, e) { // 获取鼠标当前位置
-        var rect = canvas.getBoundingClientRect();
-        //console.log("event坐标", e._x, e._y);
-        //console.log("计算坐标:", (e.clientX - rect.left) * (canvas.width / rect.width),(e.clientY - rect.top) * (canvas.height / rect.height));
-        return {
-            x : (e.clientX - rect.left) * (canvas.width / rect.width),
-            y : (e.clientY - rect.top) * (canvas.height / rect.height)
-        };
     }
 
     addLine(ctx, startX, startY, endX, endY) { // 画直线
@@ -190,7 +189,7 @@ class BoardCanvas extends BoardObject {
     addoval(ctx, startX, startY, endX, endY) { // 画圆形
         var r = this.getDistance( startX, startY, endX, endY);
 	    ctx.beginPath();
-	    ctx.arc(startX,startY,r/2,0,2*Math.PI);
+	    ctx.arc(startX,startY,r,0,2*Math.PI);
 	    ctx.stroke();
     }
 
@@ -215,69 +214,12 @@ class BoardCanvas extends BoardObject {
         ctx.stroke();
     }
 
-    addpen(ctx, startX, startY, endX, endY) {
+    addBezierCurve(ctx, beginPoint, controlPoint, endPoint) { // 画贝塞尔曲线
         ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        ctx.quadraticCurveTo(startX, startY, endX, endY);
-        ctx.stroke(); // 不会自动闭合
-        this.newstartX = endX;
-        this.newstartY = endY;
-    }
-
-    reviewaddpen(ctx, startX, startY, endX, endY) {
-        ctx.beginPath();
-        // ctx.lineWidth="10";
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX, endY);
-        ctx.stroke(); // 不会自动闭合   
-    }
-    
-
-    paint_pencil() {
-        let outer = this;
-        var tool = new tool_pencil();
-        function tool_pencil() {
-            outer.$canvas[0].addEventListener('mousedown', ev_canvas, false);
-            outer.$canvas[0].addEventListener('mousemove', ev_canvas, false);
-            outer.$canvas[0].addEventListener('mouseup', ev_canvas, false);
-            var tool = this;
-            var context = outer.ctx;
-            this.started = false; /*当您开始按住鼠标按钮时调用它。这开始了铅笔画。 */
-            this.mousedown = function (ev) {
-                ev.preventDefault(); // 当您单击画布并拖动鼠标时，光标将变为文本选择光标，“ev.preventDefault()”可以防止这种情况发生。
-                context.beginPath(); // 新建一条路径，生成之后，图形绘制命令被指向到路径上生成路径。每次这个方法调用之后，列表清空重置
-                context.moveTo(ev._x, ev._y); // 调用 beginPath() 之后，或者 canvas 刚建的时候，第一条路径构造命令通常被视为是 moveTo（）
-                tool.started = true;
-            };
-            /** * This is called every time you move the mouse. * Obviously, it only draws if the tool.started state is set to true */
-            this.mousemove = function (ev) {
-                if (tool.started) {
-                    context.lineTo(ev._x, ev._y); 
-                    context.stroke(); // 不会自动闭合。
-                }
-            };
-            /** * This is called when you release the mouse button. */
-            this.mouseup = function (ev) {
-                if (tool.started) {
-                    tool.mousemove(ev);
-                    tool.started = false;
-                    outer.$canvas[0].removeEventListener('mousedown', ev_canvas, false);
-                    outer.$canvas[0].removeEventListener('mousemove', ev_canvas, false);
-                    outer.$canvas[0].removeEventListener('mouseup', ev_canvas, false);
-                }
-            };
-        }
-        function ev_canvas(ev) {
-            var x, y;
-            if (ev.offsetX || ev.offsetY == 0) {
-                ev._x = ev.offsetX; ev._y = ev.offsetY;
-            }
-            /** * call the event handler of the tool. */
-            var func = tool[ev.type];
-            if (func) {
-                func(ev);
-            }
-        }
+        ctx.moveTo(beginPoint.x, beginPoint.y);
+        ctx.quadraticCurveTo(controlPoint.x, controlPoint.y, endPoint.x, endPoint.y);
+        ctx.stroke();
+        ctx.closePath();
     }
 
     update() {
