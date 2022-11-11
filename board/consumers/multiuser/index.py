@@ -31,12 +31,14 @@ class MultiUser(WebsocketConsumer):
         print(text_data)
         text_data_json = json.loads(text_data)
         print(text_data_json)
-        message = text_data_json['message']
+        message = text_data_json['creator']
+        # json_str = json.dumps(python2json)
+        # message=JSON.stringify(text_data_json)
         print("----")
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name, {
                 'type': 'chat.message',  # 必须在MsgConsumer类中定义chat_message
-                'message': message
+                'message': text_data_json
             })
 
 
