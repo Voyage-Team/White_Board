@@ -3,13 +3,20 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.core.cache import cache
-
+import random
 class MultiUser(AsyncWebsocketConsumer):
     async def connect(self):
         self.roomid = self.scope['url_route']['kwargs']['roomid']
         self.mode = self.scope['url_route']['kwargs']['mode']
-        self.room_group_name = 'board_%s' % self.roomid
-        print("roomid:" + self.roomid + " mode:" + self.mode)
+        roomid = int(self.roomid)
+        if roomid == 0:
+            roomid = random.randint(2, 100)
+            while cache.has_key(roomid):
+                roomid = random.randint(2, 100)
+            cache.set(roomid, [], 3600)
+            # roomid = tmp
+        self.room_group_name = 'board_%s' % roomid
+        # print("roomid:" + roomid + " mode:" + self.mode)
         # self.room_group_name = 'board_11'
         # Join room group
         await self.channel_layer.group_add(
@@ -18,6 +25,11 @@ class MultiUser(AsyncWebsocketConsumer):
         )
         print("成功连接")
         await self.accept()
+        
+        await self.send(
+            text_data=json.dumps({
+            'roomid': roomid
+        }))
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -31,7 +43,8 @@ class MultiUser(AsyncWebsocketConsumer):
         print(text_data)
         text_data_json = json.loads(text_data)
         print(text_data_json)
-        message = text_data_json['creator']
+        # message = text_data_json['data']['color']
+        message = text_data_json['opt']
         # json_str = json.dumps(python2json)
         # message=JSON.stringify(text_data_json)
         print("----")
@@ -47,6 +60,7 @@ class MultiUser(AsyncWebsocketConsumer):
         message = event['message']
 
         # Send message to WebSocket
-        self.send(text_data=json.dumps({
+        await self.send(
+            text_data=json.dumps({
             'message': message
         }))
