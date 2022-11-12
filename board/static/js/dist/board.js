@@ -42,8 +42,8 @@ class BoardObject {
 `);
         
         this.$operation = this.$boardoperation.find(".boardoperation");
-        this.$add_board = this.$operation.find(".board_operate_add_board");
-        this.$delete_board = this.$operation.find(".board_operate_delete_board");
+        this.$add_board = this.$boardoperation.find(".board_operate_add_board");
+        this.$delete_board = this.$boardoperation.find(".board_operate_delete_board");
         this.board.$board.append(this.$boardoperation);
 
         this.start();
@@ -61,14 +61,21 @@ class BoardObject {
         let outer = this;
         this.$add_board.click(function() { // 点击添加白板按钮
             // 隐藏当前白板
-
+            outer.board.paint_board.current_canvas.$canvas.hide();
             // 添加一页白板
-
-            // 将新添白板设为当前白板
+            outer.board.paint_board.create_canvas();
         });
 
-        this.$delete_board.click(function() {
-
+        this.$delete_board.click(function() { // 点击删除当前白板按钮
+            // 删除当前白板
+                // (1) 隐藏当前canvas
+            // outer.board.paint_board.current_canvas.$canvas.hide();
+                // (2) 将当前白板从列表中删除
+                    // 显示当前白板在列表中的上一页白板 (无法删除第一页白板)
+                    // 将显示出来的白板设为当前白板
+            outer.board.paint_board.delete_curCanvas();
+            console.log("删除当前白板");
+                    
         });
 
         add_board.onmouseover = function() {
@@ -99,6 +106,7 @@ class BoardObject {
         this.paint_board.$paint.append(this.$canvas);
         this.paint_board.$paint.append(this.$click);
 
+        this.mps = this.paint_board.board.mps;
         this.shapeList = new Array(); // list 数组，存放所有矢量图
         this.newstartX = 0;
         this.newstartY = 0; // 画pencil用
@@ -127,7 +135,7 @@ class BoardObject {
                 outer.beginPoint = {x, y};
                 // outer.ctx.moveTo(outer.startX, outer.startY); // 调用 beginPath() 之后，或者 canvas 刚建的时候，第一条路径构造命令通常被视为是 moveTo（）
                 
-                console.log(outer.startX, outer.startY);
+                // console.log(outer.startX, outer.startY);
                 outer.started = true;
             }
         });
@@ -170,12 +178,10 @@ class BoardObject {
                             }
                             outer.addBezierCurve(outer.ctx, outer.beginPoint, controlPoint, endPoint);
                             outer.saveBezierCurve(outer.beginPoint, controlPoint, endPoint);
+                            // 发给远端服务器
+                            outer.mps.send_paint_bezier_curve(outer.paint_board.mode, outer.beginPoint, controlPoint, endPoint);
                             outer.beginPoint = endPoint;
                         }
-                        // outer.addpen(outer.ctx, outer.newstartX, outer.newstartY, curPos.x, curPos.y);
-                        // outer.addShape(outer.newstartX+0.06, outer.newstartY+0.06, curPos.x, curPos.y);
-                        // console.log("起点：", outer.newstartX, outer.newstartY);
-                        // console.log("终点：", curPos.x, curPos.y);
                         break;
                 }
                 outer.savePoint(outer.startX, outer.startY, curPos.x, curPos.y);
@@ -185,7 +191,11 @@ class BoardObject {
             if(outer.started) {
                 outer.started = false;
                 var curPos = outer.getCursorPos(outer.ctx.canvas, e);
-                if(outer.paint_board.mode != "" && outer.paint_board.mode != "pen") outer.addShape(outer.startX, outer.startY, curPos.x, curPos.y);
+                if(outer.paint_board.mode != "" && outer.paint_board.mode != "pen") {
+                    outer.addShape(outer.startX, outer.startY, curPos.x, curPos.y);
+                    // 向服务器发送矢量图
+                    outer.mps.send_paint_regular_graphics(outer.paint_board.mode, outer.startX, outer.startY, curPos.x, curPos.y);
+                }
             }
         });
     }
@@ -248,9 +258,19 @@ class BoardObject {
         this.shapeList.push(shape);
     }
 
+    addRemoteShape(mode, startX, startY, endX, endY) { // 松开鼠标时，添加远端规则图形进数组
+        var shape = new Object();
+        shape.type = mode;
+        shape.startX = startX;
+        shape.startY = startY;
+        shape.endX = endX;
+        shape.endY = endY;
+        this.shapeList.push(shape);
+    }
+
     saveBezierCurve(beginPoint, controlPoint, endPoint) { // 存贝塞尔曲线
         var shape = new Object();
-        shape.type = this.paint_board.mode;
+        shape.type = "pen";
         shape.beginPoint = beginPoint;
         shape.controlPoint = controlPoint;
         shape.endPoint = endPoint;
@@ -322,23 +342,53 @@ class BoardObject {
 <div class="board_paint" style="position: absolute;left: 6%;width: 88%;height: 100%;background-color: #FFFFFF;"></div>        
 `);
         this.$board_paint = this.$paint.find(".board_paint");
-        // this.$paint.hide();
         this.board.$board.append(this.$paint);
         this.width = this.$paint.width(); // 为canvas画布获取宽度
         this.height = this.$paint.height(); // 为canvas画布获取高度
-
-        this.board_canvas = new BoardCanvas(this); // 默认创建一个canvas画布
+        this.default_canvas = new BoardCanvas(this); // 默认创建一个canvas画布
+        this.push_canvas(this.default_canvas);
+        this.current_canvas = this.default_canvas;
         this.mode = ""; // 默认画笔是pen
         this.start();
     }
 
     start() {
+        //this.current_canvas.$canvas.hide();
         this.add_listening_events();
     }
 
     add_listening_events() {
-        let outer = this;
-        console.log("add_listening_events");
+    }
+
+    create_canvas() { // 创建新的canvas画布
+        this.newCanvas = new BoardCanvas(this); 
+        this.push_canvas(this.newCanvas);
+        this.current_canvas = this.newCanvas; // 将新添白板设为当前白板
+    }
+
+    push_canvas(canvas) {
+        var obj = new Object();
+        obj.canvas = canvas;
+        this.board.canvas_array.push(obj);
+    }
+
+    delete_curCanvas() {
+        var i;
+        for (i in this.board.canvas_array) {
+            var obj = this.board.canvas_array[i];
+            if (obj.canvas === this.current_canvas) break;
+        }
+        console.log(i);
+        if (i == 0) { // == 相等运算符
+            console.log("弹窗警告");
+            alert("当前已经是画布的第一页");
+        } else {
+            this.current_canvas.$canvas.hide();
+            this.board.canvas_array.splice(i,1); // 从数组中删除当前canvas画布
+            this.board.canvas_array[i-1].canvas.$canvas.show();
+            this.current_canvas = this.board.canvas_array[i-1].canvas;
+        }
+        
     }
 
     update() {}
@@ -462,12 +512,154 @@ class BoardObject {
         console.log(this.roomid);
         console.log(this.mode);
         this.ws = new WebSocket('ws://'+window.location.host+'/ws/'+this.mode+'/'+this.roomid+'/');
+        this.start();
+    }
 
+    
+
+    start() {
+        this.receive();
+    }
+
+    receive() {
+        let outer = this;
+        this.ws.onmessage = function(e) {
+            let data = JSON.parse(e.data);
+            let event = data.event;
+
+            if (event === "regular_graphics") {
+                outer.receive_paint_regular_graphics(data.style, data.startX, data.startY, data.endX, data.endY);
+            } else if (event === "bezier_curve") {
+                outer.receive_paint_bezier_curve(data.style, data.start, data.control, data.end)
+            }
+        }
+    }
+
+    send_paint_bezier_curve (type, start, control, end) {
+        this.ws.send(JSON.stringify({
+            'event':"bezier_curve", 
+            'style':type,
+            'start':start,
+            'control':control,
+            'end':end,
+        }));
+    }
+
+    send_paint_regular_graphics(type, startX, startY, endX, endY) {
+        console.log(type);
+        let outer = this;
+        this.ws.send(JSON.stringify({
+            'event':"regular_graphics", 
+            'style':type,
+            'startX':startX,
+            'startY':startY,
+            'endX':endX,
+            'endY':endY,
+        }));
+    }
+
+    receive_paint_regular_graphics(style, startX, startY, endX, endY) {
+        console.log("接受规则图形");
+        if(style === "line")
+            this.board.paint_board.current_canvas.addLine(this.board.paint_board.current_canvas.ctx, startX, startY, endX, endY);
+        else if (style === "rectangle") 
+            this.board.paint_board.current_canvas.addrectangle(this.board.paint_board.current_canvas.ctx, startX, startY, endX, endY);
+        else if (style === "oval")
+            this.board.paint_board.current_canvas.addoval(this.board.paint_board.current_canvas.ctx, startX, startY, endX, endY);
+        else if (style === "triangle")
+            this.board.paint_board.current_canvas.addtriangle(this.board.paint_board.current_canvas.ctx, startX, startY, endX, endY);
+        // 存到本地数组中
+        this.board.paint_board.current_canvas.addRemoteShape(style, startX, startY, endX, endY);
+    }
+
+    receive_paint_bezier_curve(style, start, control, end) {
+        this.board.paint_board.current_canvas.addBezierCurve(this.board.paint_board.current_canvas.ctx,start,control,end);
+        // 存到本地数组中
+        this.board.paint_board.current_canvas.saveBezierCurve(start, control, end);
+    }  
+
+}class UserBehavior {
+    constructor(board) {
+        this.board = board;
+        this.$userbehavior = $(`
+<!-- 邀请/离开 -->
+<div class="userbehavior">
+    <div class="userbehavior_button">
+        <!-- 邀请 -->
+        <div class="user_invite">
+            <div class="tip tip_bottom" id="user_invite_tip">邀请</div>
+            <i class="icon_invite" id="icon_invite"></i>
+        </div>
+        <!-- 离开 -->
+        <div class="user_live">
+            <div class="tip tip_bottom" id="user_live_tip">离开</div>
+            <i class="icon_off" id="icon_leave"></i>
+        </div>
+    </div>
+    <!-- 邀请行为 -->
+    <div class="invite_copy">
+        <h2>邀请加入</h2>
+        <div class="invite_layout">
+            <span>房间号:</span>
+            <div class="invite_layout_from">
+                <input type="text" class="invite_layout_input invite_layout_input_roomid" id="invite_layout_input_roomid" value="" readonly disabled>
+                <div class="invite_layout_i">
+                    <i class="icon-copy"></i>
+                </div>
+            </div>
+        </div>
+        <div class="invite_layout">
+            <span>链接:</span>
+            <div class="invite_layout_from">
+                <input type="text" class="invite_layout_input invite_layout_input_link" id="invite_layout_input_link" value="" readonly disabled>
+                <div class="invite_layout_i">
+                    <i class="icon-copy"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>        
+`);
+        this.$behavior = this.$userbehavior.find(".userbehavior");
+        this.$icon_invite = this.$userbehavior.find(".icon_invite");
+        this.$icon_leave = this.$userbehavior.find(".icon_leave");
+        this.$invite_copy = this.$userbehavior.find(".invite_copy");
+        this.$invite_layout_input_roomid = this.$userbehavior.find(".invite_layout_input_roomid");
+        this.$invite_layout_input_roomid.val(this.board.roomid);
+        this.$invite_layout_input_link = this.$userbehavior.find(".invite_layout_input_link");
+        this.$invite_layout_input_link.val("http://123.57.187.239:8000/?roomid="+this.board.roomid);
+        this.$invite_copy.hide();
+        this.board.$board.append(this.$userbehavior);
         this.start();
     }
 
     start() {
-        
+        this.listening_event();
+    }
+
+    listening_event() {
+        let outer = this;
+        let user_invite_tip = document.getElementById('user_invite_tip');
+        let user_live_tip = document.getElementById('user_live_tip');
+        let icon_invite = document.getElementById('icon_invite');
+        let icon_leave = document.getElementById('icon_leave');
+        icon_invite.onmouseover = function() {
+            user_invite_tip.style.opacity = 1;
+        }
+        icon_leave.onmouseover = function () {
+            user_live_tip.style.opacity = 1;
+        }
+        icon_invite.onmouseout = function() {
+            user_invite_tip.style.opacity = 0;
+        }
+        icon_leave.onmouseout = function () {
+            user_live_tip.style.opacity = 0;
+        }
+
+        this.$icon_invite.click(function() {
+            outer.$invite_copy.show();
+            return false;
+        });
     }
 }class Board {
     constructor(root) {
@@ -475,18 +667,18 @@ class BoardObject {
         this.roomid = 0;
         this.mode = "";
         this.$board = $(`
-<div id="board" style="width: 100%;height: 100%;background-color: #efefef;"></div>
+<div class="board" id="board" style="width: 100%;height: 100%;background-color: #efefef;"></div>
 `);
         this.$board.hide();
+        this.$global_board = this.$board.find(".board");
         this.root.$cooperation_board.append(this.$board);
-        this.height = this.$board.height();
-        this.width = this.$board.width();
-        
+        this.canvas_array = new Array(); // 创建canvas画布数组
         this.start();
     }
 
     start() {
-        this.show(1, "none");
+        // this.show(1, "none");
+        this.listening_events();
     }
     
 
@@ -494,10 +686,18 @@ class BoardObject {
         this.roomid = roomid;
         this.mode = mode;
         this.$board.show();
-        // this.mps = new MultiUserSocket(this);
+        this.mps = new MultiUserSocket(this);
         this.paint_board = new PaintBoard(this);
         this.board_operation = new BoardOperation(this);
         this.sidebar = new SideBar(this);
+        this.userbehavior = new UserBehavior(this);
+    }
+
+    listening_events() {
+        let outer = this;
+        this.$board.click(function() {
+            outer.userbehavior.$invite_copy.hide();
+        });
     }
 
     hide() {
@@ -628,7 +828,7 @@ export class WeGame {
     constructor(id) {
         this.id = id;
         this.$cooperation_board = $('#' + id);
-        // this.home = new Home(this);
+        this.home = new Home(this);
         this.board = new Board(this);
         
         this.start();

@@ -23,8 +23,8 @@ class BoardOperation {
 `);
         
         this.$operation = this.$boardoperation.find(".boardoperation");
-        this.$add_board = this.$operation.find(".board_operate_add_board");
-        this.$delete_board = this.$operation.find(".board_operate_delete_board");
+        this.$add_board = this.$boardoperation.find(".board_operate_add_board");
+        this.$delete_board = this.$boardoperation.find(".board_operate_delete_board");
         this.board.$board.append(this.$boardoperation);
 
         this.start();
@@ -42,14 +42,21 @@ class BoardOperation {
         let outer = this;
         this.$add_board.click(function() { // 点击添加白板按钮
             // 隐藏当前白板
-
+            outer.board.paint_board.current_canvas.$canvas.hide();
             // 添加一页白板
-
-            // 将新添白板设为当前白板
+            outer.board.paint_board.create_canvas();
         });
 
-        this.$delete_board.click(function() {
-
+        this.$delete_board.click(function() { // 点击删除当前白板按钮
+            // 删除当前白板
+                // (1) 隐藏当前canvas
+            // outer.board.paint_board.current_canvas.$canvas.hide();
+                // (2) 将当前白板从列表中删除
+                    // 显示当前白板在列表中的上一页白板 (无法删除第一页白板)
+                    // 将显示出来的白板设为当前白板
+            outer.board.paint_board.delete_curCanvas();
+            console.log("删除当前白板");
+                    
         });
 
         add_board.onmouseover = function() {

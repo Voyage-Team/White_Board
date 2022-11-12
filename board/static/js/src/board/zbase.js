@@ -4,18 +4,18 @@ class Board {
         this.roomid = 0;
         this.mode = "";
         this.$board = $(`
-<div id="board" style="width: 100%;height: 100%;background-color: #efefef;"></div>
+<div class="board" id="board" style="width: 100%;height: 100%;background-color: #efefef;"></div>
 `);
         this.$board.hide();
+        this.$global_board = this.$board.find(".board");
         this.root.$cooperation_board.append(this.$board);
-        this.height = this.$board.height();
-        this.width = this.$board.width();
-        
+        this.canvas_array = new Array(); // 创建canvas画布数组
         this.start();
     }
 
     start() {
-        this.show(1, "none");
+        // this.show(1, "none");
+        this.listening_events();
     }
     
 
@@ -23,10 +23,18 @@ class Board {
         this.roomid = roomid;
         this.mode = mode;
         this.$board.show();
-        // this.mps = new MultiUserSocket(this);
+        this.mps = new MultiUserSocket(this);
         this.paint_board = new PaintBoard(this);
         this.board_operation = new BoardOperation(this);
         this.sidebar = new SideBar(this);
+        this.userbehavior = new UserBehavior(this);
+    }
+
+    listening_events() {
+        let outer = this;
+        this.$board.click(function() {
+            outer.userbehavior.$invite_copy.hide();
+        });
     }
 
     hide() {

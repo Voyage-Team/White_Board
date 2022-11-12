@@ -10,6 +10,7 @@ class BoardCanvas extends BoardObject {
         this.paint_board.$paint.append(this.$canvas);
         this.paint_board.$paint.append(this.$click);
 
+        this.mps = this.paint_board.board.mps;
         this.shapeList = new Array(); // list 数组，存放所有矢量图
         this.newstartX = 0;
         this.newstartY = 0; // 画pencil用
@@ -38,7 +39,7 @@ class BoardCanvas extends BoardObject {
                 outer.beginPoint = {x, y};
                 // outer.ctx.moveTo(outer.startX, outer.startY); // 调用 beginPath() 之后，或者 canvas 刚建的时候，第一条路径构造命令通常被视为是 moveTo（）
                 
-                console.log(outer.startX, outer.startY);
+                // console.log(outer.startX, outer.startY);
                 outer.started = true;
             }
         });
@@ -81,12 +82,10 @@ class BoardCanvas extends BoardObject {
                             }
                             outer.addBezierCurve(outer.ctx, outer.beginPoint, controlPoint, endPoint);
                             outer.saveBezierCurve(outer.beginPoint, controlPoint, endPoint);
+                            // 发给远端服务器
+                            outer.mps.send_paint_bezier_curve(outer.paint_board.mode, outer.beginPoint, controlPoint, endPoint);
                             outer.beginPoint = endPoint;
                         }
-                        // outer.addpen(outer.ctx, outer.newstartX, outer.newstartY, curPos.x, curPos.y);
-                        // outer.addShape(outer.newstartX+0.06, outer.newstartY+0.06, curPos.x, curPos.y);
-                        // console.log("起点：", outer.newstartX, outer.newstartY);
-                        // console.log("终点：", curPos.x, curPos.y);
                         break;
                 }
                 outer.savePoint(outer.startX, outer.startY, curPos.x, curPos.y);
@@ -96,7 +95,11 @@ class BoardCanvas extends BoardObject {
             if(outer.started) {
                 outer.started = false;
                 var curPos = outer.getCursorPos(outer.ctx.canvas, e);
-                if(outer.paint_board.mode != "" && outer.paint_board.mode != "pen") outer.addShape(outer.startX, outer.startY, curPos.x, curPos.y);
+                if(outer.paint_board.mode != "" && outer.paint_board.mode != "pen") {
+                    outer.addShape(outer.startX, outer.startY, curPos.x, curPos.y);
+                    // 向服务器发送矢量图
+                    outer.mps.send_paint_regular_graphics(outer.paint_board.mode, outer.startX, outer.startY, curPos.x, curPos.y);
+                }
             }
         });
     }
@@ -159,9 +162,19 @@ class BoardCanvas extends BoardObject {
         this.shapeList.push(shape);
     }
 
+    addRemoteShape(mode, startX, startY, endX, endY) { // 松开鼠标时，添加远端规则图形进数组
+        var shape = new Object();
+        shape.type = mode;
+        shape.startX = startX;
+        shape.startY = startY;
+        shape.endX = endX;
+        shape.endY = endY;
+        this.shapeList.push(shape);
+    }
+
     saveBezierCurve(beginPoint, controlPoint, endPoint) { // 存贝塞尔曲线
         var shape = new Object();
-        shape.type = this.paint_board.mode;
+        shape.type = "pen";
         shape.beginPoint = beginPoint;
         shape.controlPoint = controlPoint;
         shape.endPoint = endPoint;
