@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>png/curve.png</file>
+        <file>png/delete.png</file>
+        <file>png/line.png</file>
+        <file>png/Oval.png</file>
+        <file>png/pen.png</file>
+        <file>png/Rectangle.png</file>
+        <file>png/revoke.png</file>
+        <file>png/Triangle.png</file>
+        <file>jpg/create_meeting.jpg</file>
+        <file>jpg/home_bg.png</file>
+        <file>jpg/join_meeting.jpg</file>
+    </qresource>
+</RCC>
