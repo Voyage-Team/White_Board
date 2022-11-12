@@ -6,23 +6,19 @@ class BoardCanvas extends BoardObject {
         this.ctx = this.$canvas[0].getContext('2d');
         this.ctx.canvas.width = this.paint_board.width;
         this.ctx.canvas.height = this.paint_board.height;
-        // this.x1 = (this.paint_board.board.width - this.paint_board.width)/2;
-        // this.y1 = (this.paint_board.board.height - this.paint_board.height)/2;
-        //this.ctx.fillStyle = "white";
-        //this.ctx.fillRect(0, 0, this.paint_board.width, this.paint_board.height);
         // this.$canvas.hide();
         this.paint_board.$paint.append(this.$canvas);
-
+        this.paint_board.$paint.append(this.$click);
 
         this.shapeList = new Array(); // list 数组，存放所有矢量图
         this.newstartX = 0;
         this.newstartY = 0; // 画pencil用
         this.points = new Array(); // 画pencil用的数组
         this.beginPoint = null;
-        this.test();
+        this.start();
     }
 
-    test() {
+    start() {
         let outer = this;
         this.started = false;
         this.startX = 0;

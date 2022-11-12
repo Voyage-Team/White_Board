@@ -18,6 +18,9 @@ class MultiUser(WebsocketConsumer):
         # )
         print("成功连接")
         self.accept()
+        self.send(text_data=json.dumps({
+            'message': message
+        }))
 
     def disconnect(self, close_code):
         # Leave room group

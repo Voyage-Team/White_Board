@@ -214,3 +214,72 @@
     background-size: 100% 100%;
     cursor: pointer;
 }
+
+/*-------------- 白板操作 --------------*/
+
+.boardoperation {
+    position: fixed;
+    bottom: 20px;
+    right: 223px;
+    display: flex;
+}
+
+.boardoperation .repeal {
+    margin: 0 10px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0px 2px 20px 0px rgb(192 192 205 / 20%);
+}
+
+.boardoperation .board_operate {
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+}
+
+.boardoperation .board_operate .repeal_options {
+    margin: 0;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+}
+
+.boardoperation .board_operate .repeal_options .tip {
+    top: -36px;
+    opacity: 0;
+    /*visibility: hidden;*/
+    transition: opacity 1s;
+    position: absolute;
+    padding: 6px 12px;
+    background-color: #5a5a66;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    font-size: 12px;
+    user-select: none;
+    z-index: 20;
+}
+
+.boardoperation .board_operate .repeal_options .board_operate_add_board {
+    font-size: 24px;
+    color: #5a5a67;
+    background-image: url("/static/image/boardoperation/add_board.png");
+    background-size: 100% 100%;
+    height: 30px;
+    width: 30px;
+}
+
+.boardoperation .board_operate .repeal_options .board_operate_delete_board {
+    font-size: 24px;
+    color: #5a5a67;
+    background-image: url("/static/image/boardoperation/delete_board.png");
+    background-size: 100% 100%;
+    height: 30px;
+    width: 30px;
+}

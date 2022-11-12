@@ -17,6 +17,76 @@ class BoardObject {
     destroy() { // 删掉该图形
 
     }
+}class BoardOperation {
+    constructor(board) {
+        this.board = board;
+        this.$boardoperation = $(`
+<!-- 白板操作 -->
+<div class="boardoperation">
+    <!-- 白板分页 -->
+    <div class="repeal">
+        <div class="board_operate">
+            <!-- 添加白板 -->
+            <div class="repeal_options">
+                <div class="tip" id="tip_add_board">添加白板</div>
+                <i class="board_operate_add_board" id="board_operate_add_board"></i>
+            </div>
+            <!-- 删除白板 -->
+            <div class="repeal_options">
+                <div class="tip" id="tip_delete_board">删除白板</div>
+                <i class="board_operate_delete_board" id="board_operate_delete_board"></i>
+            </div>
+        </div>
+    </div>
+</div>        
+`);
+        
+        this.$operation = this.$boardoperation.find(".boardoperation");
+        this.$add_board = this.$operation.find(".board_operate_add_board");
+        this.$delete_board = this.$operation.find(".board_operate_delete_board");
+        this.board.$board.append(this.$boardoperation);
+
+        this.start();
+    }
+
+    start() {
+        this.listening_events();
+    }
+
+    listening_events() {
+        let add_board_tip = document.getElementById('tip_add_board');
+        let delete_board_tip = document.getElementById('tip_delete_board');
+        let add_board = document.getElementById('board_operate_add_board');
+        let delete_board = document.getElementById('board_operate_delete_board');
+        let outer = this;
+        this.$add_board.click(function() { // 点击添加白板按钮
+            // 隐藏当前白板
+
+            // 添加一页白板
+
+            // 将新添白板设为当前白板
+        });
+
+        this.$delete_board.click(function() {
+
+        });
+
+        add_board.onmouseover = function() {
+            add_board_tip.style.opacity = 1;
+        }
+    
+        add_board.onmouseout = function() {
+            add_board_tip.style.opacity = 0;
+        }
+
+        delete_board.onmouseover = function() {
+            delete_board_tip.style.opacity = 1;
+        }
+
+        delete_board.onmouseout = function() {
+            delete_board_tip.style.opacity = 0;
+        }
+    }
 }class BoardCanvas extends BoardObject {
     constructor(paint_board) {
         super();
@@ -25,23 +95,19 @@ class BoardObject {
         this.ctx = this.$canvas[0].getContext('2d');
         this.ctx.canvas.width = this.paint_board.width;
         this.ctx.canvas.height = this.paint_board.height;
-        // this.x1 = (this.paint_board.board.width - this.paint_board.width)/2;
-        // this.y1 = (this.paint_board.board.height - this.paint_board.height)/2;
-        //this.ctx.fillStyle = "white";
-        //this.ctx.fillRect(0, 0, this.paint_board.width, this.paint_board.height);
         // this.$canvas.hide();
         this.paint_board.$paint.append(this.$canvas);
-
+        this.paint_board.$paint.append(this.$click);
 
         this.shapeList = new Array(); // list 数组，存放所有矢量图
         this.newstartX = 0;
         this.newstartY = 0; // 画pencil用
         this.points = new Array(); // 画pencil用的数组
         this.beginPoint = null;
-        this.test();
+        this.start();
     }
 
-    test() {
+    start() {
         let outer = this;
         this.started = false;
         this.startX = 0;
@@ -253,17 +319,16 @@ class BoardObject {
     constructor(board) {
         this.board = board;
         this.$paint = $(`
-<div class="board_paint" style="transform: translate(-50%, -50%);position: absolute;left: 50%;top: 50%;width: 80%;height: 80%;background-color: #FFFFFF;"></div>        
+<div class="board_paint" style="position: absolute;left: 6%;width: 88%;height: 100%;background-color: #FFFFFF;"></div>        
 `);
         this.$board_paint = this.$paint.find(".board_paint");
         // this.$paint.hide();
         this.board.$board.append(this.$paint);
-        this.width = this.$paint.width();
-        this.height = this.$paint.height();
-        console.log(this.width, this.height );
-        this.board_canvas = new BoardCanvas(this);
+        this.width = this.$paint.width(); // 为canvas画布获取宽度
+        this.height = this.$paint.height(); // 为canvas画布获取高度
+
+        this.board_canvas = new BoardCanvas(this); // 默认创建一个canvas画布
         this.mode = ""; // 默认画笔是pen
-        this.ctx = this.board_canvas.ctx;
         this.start();
     }
 
@@ -274,27 +339,6 @@ class BoardObject {
     add_listening_events() {
         let outer = this;
         console.log("add_listening_events");
-        this.board_canvas.$canvas.on("contextmenu", function() {
-            console.log("return false");
-            return false;
-        });
-        // this.board_canvas.$canvas.mousedown(function(e) {
-        //     const rect = outer.ctx.canvas.getBoundingClientRect();
-        //     if(e.which === 1) {
-        //         // let tx = (e.clientX - rect.left)/outer.height;
-        //         // let ty = (e.clientY - rect.top) /outer.height;
-        //         // console.log(tx, ty);
-        //         // if (outer.mode = "line") { // 画直线
-        //         //     outer.paint_line(tx, ty);
-        //         // }
-        //         // 发送给服务器
-        //     }
-
-        // });
-    }
-
-    paint_line() { // 画直线
-
     }
 
     update() {}
@@ -306,6 +350,7 @@ class BoardObject {
     constructor(board) {
         this.board = board;
         this.$sidebar = $(`
+<!-- 侧边栏 -->
 <div class="sidebar">
     <div id="ToolBarWhiteBoard" class="toolbar">
         <div class="toolbar_tool">
@@ -356,27 +401,52 @@ class BoardObject {
     add_listening_events() {
         let outer = this;
         this.$toolbar_line.click(function () {
+            outer.$toolbar_line.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/select_line.png' + ")");
+            outer.$toolbar_rectangle.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/Rectangle.png' + ")");
+            outer.$toolbar_oval.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/Oval.png' + ")");
+            outer.$toolbar_triangle.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/Triangle.png' + ")");
+            outer.$toolbar_pen.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/pen.png' + ")");
             outer.modify_cursor_style_crosshair();
             outer.board.paint_board.mode = "line";
         });
-        this.$toolbar_rectangle.click(function() {
+        this.$toolbar_rectangle.click(function () {
+            outer.$toolbar_rectangle.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/select_Rectangle.png' + ")");
+            outer.$toolbar_line.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/line.png' + ")");
+            outer.$toolbar_oval.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/Oval.png' + ")");
+            outer.$toolbar_triangle.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/Triangle.png' + ")");
+            outer.$toolbar_pen.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/pen.png' + ")");
             outer.modify_cursor_style_crosshair();
             outer.board.paint_board.mode = "rectangle";
         });
-        this.$toolbar_oval.click(function() {
+        this.$toolbar_oval.click(function () {
+            outer.$toolbar_oval.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/select_Oval.png' + ")");
+            outer.$toolbar_line.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/line.png' + ")");
+            outer.$toolbar_rectangle.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/Rectangle.png' + ")");
+            outer.$toolbar_triangle.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/Triangle.png' + ")");
+            outer.$toolbar_pen.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/pen.png' + ")");
             outer.modify_cursor_style_crosshair();
             outer.board.paint_board.mode = "oval";
         });
-        this.$toolbar_triangle.click(function() {
+        this.$toolbar_triangle.click(function () {
+            outer.$toolbar_triangle.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/select_Triangle.png' + ")");
+            outer.$toolbar_line.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/line.png' + ")");
+            outer.$toolbar_rectangle.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/Rectangle.png' + ")");
+            outer.$toolbar_oval.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/Oval.png' + ")");
+            outer.$toolbar_pen.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/pen.png' + ")");
             outer.modify_cursor_style_crosshair();
             outer.board.paint_board.mode = "triangle";
         });
-        this.$toolbar_pen.click(function() {
+        this.$toolbar_pen.click(function () {
+            outer.$toolbar_pen.css("background-i mage", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/select_pen.png' + ")");
+            outer.$toolbar_line.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/line.png' + ")");
+            outer.$toolbar_rectangle.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/Rectangle.png' + ")");
+            outer.$toolbar_oval.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/Oval.png' + ")");
+            outer.$toolbar_triangle.css("background-image", "url(" + 'http://123.57.187.239:8000/static/image/sidebar/Triangle.png' + ")");
             outer.modify_cursor_style_pen();
             outer.board.paint_board.mode = "pen";
         });
     }
-    
+
     modify_cursor_style_crosshair() {  // 修改鼠标样式为十字准心crosshair
         this.cursor.style.cursor = "crosshair";
     }
@@ -407,8 +477,6 @@ class BoardObject {
         this.$board = $(`
 <div id="board" style="width: 100%;height: 100%;background-color: #efefef;"></div>
 `);
-        
-
         this.$board.hide();
         this.root.$cooperation_board.append(this.$board);
         this.height = this.$board.height();
@@ -428,6 +496,7 @@ class BoardObject {
         this.$board.show();
         // this.mps = new MultiUserSocket(this);
         this.paint_board = new PaintBoard(this);
+        this.board_operation = new BoardOperation(this);
         this.sidebar = new SideBar(this);
     }
 
