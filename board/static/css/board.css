@@ -1,3 +1,4 @@
+/*-------------- home界面 --------------*/
 .home {
     height: 100%;
     background: #f5f6fa;
@@ -116,4 +117,300 @@
     border-radius: 40px;
     cursor: pointer;
     user-select: none;
+}
+
+/*-------------- 画布 --------------*/
+.board_paint {
+    cursor: default;
+    /* cursor: url("/static/image/sidebar/pen.ico")8 20, pointer; */
+}
+
+
+/*-------------- 侧边栏 --------------*/
+.sidebar {
+    position: fixed;
+    top:0;
+    bottom: 0;
+    margin: auto;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.toolbar {
+    background: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0px 2px 20px 0px rgb(192 192 205 / 20%);
+    padding: 8px 2px;
+}
+
+.toolbar_tool {
+    position: relative;
+    padding: 6px 6px;
+}
+
+.toolbar_tool_button {
+    z-index: 40;
+    border-radius: 4px;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.toolbar_tool_button_icon_line {
+    height: 20px;
+    width: 20px;
+    font-size: 20px;
+    opacity: 1;
+    color: #5a5a67;
+    background-image: url("/static/image/sidebar/line.png");
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.toolbar_tool_button_icon_rectangle {
+    height: 20px;
+    width: 20px;
+    font-size: 20px;
+    opacity: 1;
+    color: #5a5a67;
+    background-image: url("/static/image/sidebar/Rectangle.png");
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.toolbar_tool_button_icon_oval {
+    height: 20px;
+    width: 20px;
+    font-size: 20px;
+    opacity: 1;
+    color: #5a5a67;
+    background-image: url("/static/image/sidebar/Oval.png");
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.toolbar_tool_button_icon_triangle {
+    height: 20px;
+    width: 20px;
+    font-size: 20px;
+    opacity: 1;
+    color: #5a5a67;
+    background-image: url("/static/image/sidebar/Triangle.png");
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+.toolbar_tool_button_icon_pen {
+    height: 20px;
+    width: 20px;
+    font-size: 20px;
+    opacity: 1;
+    color: #5a5a67;
+    background-image: url("/static/image/sidebar/pen.png");
+    background-size: 100% 100%;
+    cursor: pointer;
+}
+
+/*-------------- 白板操作 --------------*/
+
+.boardoperation {
+    position: fixed;
+    bottom: 20px;
+    right: 223px;
+    display: flex;
+}
+
+.boardoperation .repeal {
+    margin: 0 10px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0px 2px 20px 0px rgb(192 192 205 / 20%);
+}
+
+.boardoperation .board_operate {
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+}
+
+.boardoperation .board_operate .repeal_options {
+    margin: 0;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+}
+
+.boardoperation .board_operate .repeal_options .tip {
+    top: -36px;
+    opacity: 0;
+    /*visibility: hidden;*/
+    transition: opacity 1s;
+    position: absolute;
+    padding: 6px 12px;
+    background-color: #5a5a66;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    font-size: 12px;
+    user-select: none;
+    z-index: 20;
+}
+
+.boardoperation .board_operate .repeal_options .board_operate_add_board {
+    font-size: 24px;
+    color: #5a5a67;
+    background-image: url("/static/image/boardoperation/add_board.png");
+    background-size: 100% 100%;
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
+}
+
+.boardoperation .board_operate .repeal_options .board_operate_delete_board {
+    font-size: 24px;
+    color: #5a5a67;
+    background-image: url("/static/image/boardoperation/delete_board.png");
+    background-size: 100% 100%;
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
+}
+
+/*-------------- 邀请/离开 --------------*/
+.userbehavior {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+}
+
+.userbehavior_button {
+    background: #fff;
+    display: flex;
+    box-shadow: 0px 2px 20px 0px rgb(192 192 205 / 20%);
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+
+.user_invite {
+    position: relative;
+    margin: 0 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.tip_bottom {
+    bottom: -36px;
+    width: 100%;
+    opacity: 0;
+    /*visibility: hidden;*/
+    transition: opacity 1s;
+    position: absolute;
+    padding: 6px 12px;
+    background-color: #5a5a66;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    font-size: 12px;
+    user-select: none;
+    z-index: 20;
+}
+
+.icon_invite {
+    background-image: url("/static/image/InviteandOff/invite_icon.png");
+    background-size: 100% 100%;
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
+}
+
+.user_live {
+    position: relative;
+    margin: 0 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.icon_off {
+    background-image: url("/static/image/InviteandOff/leave_icon.png");
+    background-size: 100% 100%;
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
+}
+
+.invite_copy {
+    /* opacity: 0;
+    visibility: hidden;
+    transition: opacity 1s; */
+    position: absolute;
+    top: 48px;
+    z-index: -50;
+    background: #fff;
+    box-shadow: 0px 2px 20px 0px rgb(192 192 205 / 20%);
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #c0c0cc;
+    user-select: none;
+}
+
+.invite_copy > h2 {
+    color: #1a1a1e;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.invite_layout {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.invite_layout > span {
+    white-space: nowrap;
+}
+
+.invite_layout_from {
+    margin-left: 14px;
+    display: flex;
+}
+
+.invite_layout_input {
+    border: 0;
+    background: #f5f6fa;
+    color: #5a5a66;
+    padding: 0 6px;
+}
+
+.invite_layout_i {
+    cursor: pointer;
+    margin-left: 8px;
+    width: 25px;
+    height: 25px;
+    position: inherit;
+}
+
+.icon-copy {
+    background-image: url("/static/image/InviteandOff/copy.png");
+    background-size: 100% 100%;
+    height: 25px;
+    width: 25px;
+    cursor: pointer;
+    position: fixed;
 }

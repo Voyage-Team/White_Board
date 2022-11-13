@@ -25,11 +25,15 @@ class MultiUser(AsyncWebsocketConsumer):
         )
         print("成功连接")
         await self.accept()
+        flag = int(0)
+        if flag == 0:
+            flag = 1
+            await self.send(
+                text_data=json.dumps({
+                'roomid': roomid
+            }))
         
-        await self.send(
-            text_data=json.dumps({
-            'roomid': roomid
-        }))
+        
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -44,7 +48,7 @@ class MultiUser(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         print(text_data_json)
         # message = text_data_json['data']['color']
-        message = text_data_json['opt']
+        # message = text_data_json['opt']
         # json_str = json.dumps(python2json)
         # message=JSON.stringify(text_data_json)
         print("----")
