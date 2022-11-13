@@ -10,7 +10,7 @@ daphne -b 0.0.0.0 -p 5015 White_Board.asgi:application
 
 **网页客户端打开方式**
 
-url：http://123.57.187.239:8000/可以访问
+url：http://123.57.187.239:8000/ 
 
 
 
