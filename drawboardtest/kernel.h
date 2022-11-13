@@ -26,7 +26,7 @@ public:
 signals:
 
 public slots:
-    void slot_Websocket_Join(int num); // 输入房间号处理
+    void slot_Websocket_Join(QString num); // 输入房间号处理
     void slot_Websocket_Create(int numCreate); // 新建房间
 
 private:

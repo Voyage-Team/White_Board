@@ -148,8 +148,8 @@ void MainWindow::on_button1_clicked()
 
 void MainWindow::on_pushButton_clicked()
 {
-    QString numQ = ui->la->text();
-    int num = numQ.toInt();
+    QString num = ui->la->text();
+//    int num = numQ.toInt();
     Q_EMIT SIG_Num_Join(num);
 }
 
@@ -185,10 +185,19 @@ void MainWindow::Rev()
 
 void MainWindow::Del()
 {
-    //if(conn) conn->clearFigure(-1);
+//    QString msg = QString("{\"type\":\"clear\",\"owner_id\":%1}\n").arg(ownerId);
+//    QByteArray sendMsg = msg.toUtf8();
+    QJsonObject delmsg;
+    delmsg.insert("owner_id","-1");
+
+    QJsonObject senddelmsg;
+    senddelmsg.insert("message",QJsonValue(delmsg));
+    senddelmsg.insert("opt","clear");
+    onSend(senddelmsg);
+    qDebug()<<senddelmsg;
 }
 
-void MainWindow::join()
+void MainWindow::join(QString roomid)
 {
     if (dataRecvWS == Q_NULLPTR) {
         dataRecvWS = new QWebSocket();
@@ -206,24 +215,52 @@ void MainWindow::join()
                 this,SLOT(onFigureDeleted(int)));
         connect(this,SIGNAL(figureCleared(int)),
                 this,SLOT(onFigureCleared(int)));
-//        connect(dataRecvWS,&QWebSocket::connected,this,&MainWindow::onSend);
-
         connect(_pTimer,SIGNAL(timeout()),this,SLOT(reconnect()),Qt::AutoConnection);
-        dataRecvWS->open(QUrl("ws://198.148.99.145:8000/ws/join/50/"));
+//        dataRecvWS->open(QUrl("ws://198.148.99.145:8000/ws/join/1/"));
+        QString path = QString("ws://198.148.99.145:8000/ws/join/"+roomid+'/');
+        QUrl url = QUrl(path);
+        qDebug()<<path;
+        dataRecvWS->open(url);
     }
-//    if(!dataRecvWS)
-//    {
-//        conn = new NetConnect(this);
-//        //m_conn->join(strName,"111.231.61.143",9001);
-//        conn->join(strName,"127.0.0.1",9001);
-    //    }
+}
+void MainWindow::create() {
+    if (dataRecvWS == Q_NULLPTR) {
+        dataRecvWS = new QWebSocket();
+        qDebug()<<"create websocket!";
+        connect(dataRecvWS,&QWebSocket::disconnected,this,&MainWindow::onDisconnected);
+        connect(dataRecvWS,&QWebSocket::textMessageReceived,this,&MainWindow::onTextReceived);
+        connect(dataRecvWS,&QWebSocket::connected,this,&MainWindow::onConnected);
+        connect(this,SIGNAL(joined(QString,int)),
+                this,SLOT(onJoined(QString,int)));
+        connect(this,SIGNAL(userLeft(QString,int)),
+                this,SLOT(onUserLeft(QString,int)));
+        connect(this,SIGNAL(figureAdded(QJsonObject)),
+                this,SLOT(onFigureAdded(QJsonObject)));
+        connect(this,SIGNAL(figureDeleted(int)),
+                this,SLOT(onFigureDeleted(int)));
+        connect(this,SIGNAL(figureCleared(int)),
+                this,SLOT(onFigureCleared(int)));
+        connect(_pTimer,SIGNAL(timeout()),this,SLOT(reconnect()),Qt::AutoConnection);
+        dataRecvWS->open(QUrl("ws://198.148.99.145:8000/ws/create/0/"));
+    }
+
 }
 
 void MainWindow::dealMsg(QString recvMsg)
 {
     QJsonDocument MsgJson = QJsonDocument::fromJson(recvMsg.toLocal8Bit().data());
+    qDebug()<<MsgJson<<"msgjson";
     QJsonObject MsgObj = MsgJson.object();
-    QString type = MsgObj.value("type").toString();
+    qDebug()<<MsgObj<<"MsgObj";
+    QJsonObject message = MsgObj.value("message").toObject();
+    int roomid = MsgObj.value("roomid").toInt();
+    QString id = QString::number(roomid);
+    QString Qroomid = "房间号:"+id;
+    qDebug()<<Qroomid<<"roomid";
+    if(roomid!=0){
+        this->setWindowTitle(Qroomid);
+    }
+    QString type = message.value("opt").toString();
     if(type == "join_reply")
     {
         m_id = MsgObj.value("id").toInt();
@@ -255,9 +292,31 @@ void MainWindow::dealMsg(QString recvMsg)
     }
     else if(type =="add")
     {
-        auto figures = MsgObj.value("figure").toObject();
+        auto figures = MsgObj.value("message").toObject();
+        qDebug() << figures;
         emit figureAdded(figures);
+        //qDebug() << "adddddddddddd!";
     }
+//    else if(type =="rect")
+//    {
+//        auto figures = MsgObj.value("figure").toObject();
+//        emit figureAdded(figures);
+//    }
+//    else if(type =="oval")
+//    {
+//        auto figures = MsgObj.value("figure").toObject();
+//        emit figureAdded(figures);
+//    }
+//    else if(type =="triangle")
+//    {
+//        auto figures = MsgObj.value("figure").toObject();
+//        emit figureAdded(figures);
+//    }
+//    else if(type =="curve")
+//    {
+//        auto figures = MsgObj.value("figure").toObject();
+//        emit figureAdded(figures);
+//    }
     else if(type =="delete")
     {
         auto global = MsgObj.value("global_id").toInt();
@@ -265,8 +324,12 @@ void MainWindow::dealMsg(QString recvMsg)
     }
     else if(type =="clear")
     {
-        auto owner = MsgObj.value("owner_id").toInt();
-        emit figureCleared(owner);
+//        qDebug() <<"message"<<message;
+//        QJsonObject mes = message.value("message").toObject();
+//        qDebug() <<"mes"<<mes;
+//        auto owner = mes.value("owner_id").toInt();
+//        qDebug() <<"owner_id"<<owner;
+        emit figureCleared(-1);
 
     }
     else
@@ -306,6 +369,7 @@ void MainWindow::onTextReceived(QString msg)
 {
     qDebug() << msg.toStdString().data();
     qDebug("textReceiveString");
+
     dealMsg(msg.toStdString().data());
 }
 //断开连接会启动定时器，触发这个槽函数重新连接

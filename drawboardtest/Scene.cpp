@@ -155,11 +155,13 @@ void QScene::onFigureDeleted(int id)
 void QScene::onFigureCleared(int ownerId)
 {
         qDebug() <<"PainterScene::onFigureCleared";
+        qDebug() << "ownerID =" << ownerId;
         if(ownerId == -1)
         {
             clear();
             m_shapes.clear();
             update();
+            qDebug() << "ownerID == -1";
         }
         else
         {
@@ -258,6 +260,10 @@ void QScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             m_currentShape->serialize(figure);
             figure.insert("creator",QJsonValue(m_id));
             figure.insert("local_id",QJsonValue(m_currentShape->localId()));
+//            QJsonObject total;
+//            total.insert("figure:",QJsonValue(figure));
+//            total.insert("opt:","add");
+            figure.insert("opt","add");
             emit addFigureReq(figure);
 
         }
