@@ -6,7 +6,7 @@ daphne -b 0.0.0.0 -p 5015 White_Board.asgi:application
 url：http://123.57.187.239:8000/可以访问
 
 QT客户端
-下载drawboardtest文件夹，打开pro文件，debug运行
+打开Package文件夹，运行drawboardtest.exe即可
 
 demo视频链接：
 
