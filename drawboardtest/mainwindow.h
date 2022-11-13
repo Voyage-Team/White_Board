@@ -22,7 +22,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 signals:
     //房间号信号
-    void SIG_Num_Join(int num);
+    void SIG_Num_Join(QString num);
     void SIG_Num_Create(int numCreate);
     void joined(QString name,int id);
     void userLeft(QString name,int id);
@@ -38,7 +38,8 @@ public:
     void hideUi2();
     void prepareCanvas();
     void closeEvent(QCloseEvent *event);
-    void join();
+    void join(QString roomid);
+    void create();
     void dealMsg(QString recvMsg);
 private slots:
 

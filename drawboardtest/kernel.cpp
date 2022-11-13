@@ -8,7 +8,7 @@ Kernel::Kernel(QObject *parent) : QObject(parent)
     dataRecvWS = Q_NULLPTR;
     mwd = new MainWindow;
     mwd->showNormal();
-    connect(mwd, SIGNAL(SIG_Num_Join(int)),this,SLOT(slot_Websocket_Join(int)));
+    connect(mwd, SIGNAL(SIG_Num_Join(QString)),this,SLOT(slot_Websocket_Join(QString)));
     connect(mwd, SIGNAL(SIG_Num_Create(int)),this,SLOT(slot_Websocket_Create(int)));
 }
 Kernel::~Kernel()
@@ -20,16 +20,17 @@ Kernel::~Kernel()
     }
 }
 
-void Kernel::slot_Websocket_Join(int num)
+void Kernel::slot_Websocket_Join(QString num)
 {
     mwd->hideUi2();
-    mwd->join();
+    mwd->join(num);
+    mwd->setWindowTitle("房间号:"+num);
     mwd->prepareCanvas();
 }
 
 void Kernel::slot_Websocket_Create(int numCreate)
 {
     mwd->hideUi1();
-    mwd->join();
+    mwd->create();
     mwd->prepareCanvas();
 }
