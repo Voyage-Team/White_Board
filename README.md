@@ -14,7 +14,7 @@ url：http://123.57.187.239:8000/可以访问
 
 
 
-## QT客户端
+## Qt客户端
 
 打开Package文件夹，运行drawboardtest.exe即可
 
