@@ -41,6 +41,9 @@
       <height>441</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background-image: url(:/jpg/home_bg.png);</string>
+    </property>
     <property name="text">
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/jpg/home_bg.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
@@ -58,7 +61,8 @@
      <bool>false</bool>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-image: url(:/jpg/create_meeting.jpg);</string>
+     <string notr="true">
+background-image: url(:/jpg/create_meeting.jpg);</string>
     </property>
     <property name="text">
      <string/>

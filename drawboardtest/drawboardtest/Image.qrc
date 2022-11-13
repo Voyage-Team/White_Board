@@ -8,5 +8,8 @@
         <file>png/Rectangle.png</file>
         <file>png/revoke.png</file>
         <file>png/Triangle.png</file>
+        <file>jpg/create_meeting.jpg</file>
+        <file>jpg/home_bg.png</file>
+        <file>jpg/join_meeting.jpg</file>
     </qresource>
 </RCC>
