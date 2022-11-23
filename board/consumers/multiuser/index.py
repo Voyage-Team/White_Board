@@ -5,7 +5,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from django.core.cache import cache
 import random
 mes = []
-inf = {"0":mes}
+inf = {0:mes}
 class MultiUser(AsyncWebsocketConsumer):
     async def connect(self):
         self.roomid = self.scope['url_route']['kwargs']['roomid']
@@ -33,7 +33,7 @@ class MultiUser(AsyncWebsocketConsumer):
         if connect == 1:
             await self.send(
                 text_data=json.dumps({
-                'roomid': "-1"
+                'roomid': -1
             }))
         flag = int(0)
         if flag == 0:
@@ -43,9 +43,9 @@ class MultiUser(AsyncWebsocketConsumer):
                 'roomid': roomid
             }))
         
-        inf = {self.roomid:mes}
-        for i in inf[self.roomid]:
-            print(i)
+        inf = {roomid:mes}
+        for i in inf[roomid]:
+            print(roomid)
             await self.send(
                 text_data=json.dumps({
                     # 'type': 'chat.message',  # 必须在MsgConsumer类中定义chat_message
@@ -57,7 +57,7 @@ class MultiUser(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         # Leave room group
         
-        del inf[self.roomid]
+        # del inf[roomid]
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -68,9 +68,9 @@ class MultiUser(AsyncWebsocketConsumer):
         print(text_data)
         text_data_json = json.loads(text_data)
         print(text_data_json)
-        roomid = text_data_json['roomid']
-        
-        # inf[self.roomid].append(text_data_json) #需要客户端传递一个roomid
+        roomid = int(text_data_json['roomid'])
+        print(roomid)
+        inf = {roomid:mes}
         inf[roomid].append(text_data_json)
         
         # json_str = json.dumps(python2json)
