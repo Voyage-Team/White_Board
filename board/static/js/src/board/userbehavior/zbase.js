@@ -47,7 +47,7 @@ class UserBehavior {
         this.$invite_layout_input_roomid = this.$userbehavior.find(".invite_layout_input_roomid");
         this.$invite_layout_input_roomid.val(this.board.roomid);
         this.$invite_layout_input_link = this.$userbehavior.find(".invite_layout_input_link");
-        this.$invite_layout_input_link.val("http://123.57.187.239:8000/?roomid="+this.board.roomid);
+        this.$invite_layout_input_link.val("http://139.9.62.204:8001/?roomid="+this.board.roomid);
         this.$invite_copy.hide();
         this.board.$board.append(this.$userbehavior);
         this.start();
